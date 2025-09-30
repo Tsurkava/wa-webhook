@@ -1,13 +1,11 @@
 {
-  "name": "wa-webhook",
+  "name": "meta-webhook-verifier",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "body-parser": "^1.20.2"
-  },
-  "engines": { "node": ">=18" }
+    "express": "^4.18.2"
+  }
 }
