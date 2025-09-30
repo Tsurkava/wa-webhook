@@ -1,40 +1,21 @@
 const express = require("express");
-const bodyParser = require("body-parser");
-
 const app = express();
-app.use(bodyParser.json());
-
-const VERIFY_TOKEN = process.env.VERIFY_TOKEN || "tsurkava123";
-const MAKE_WEBHOOK_URL = process.env.MAKE_WEBHOOK_URL || "";
-
-app.get("/", (req, res) => res.send("OK"));
+const PORT = process.env.PORT || 3000;
 
 app.get("/webhook", (req, res) => {
+  const VERIFY_TOKEN = "tsurkava123"; // твой маркер
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
-  if (mode === "subscribe" && token === VERIFY_TOKEN) {
-    return res.status(200).send(challenge);
-  }
-  return res.sendStatus(403);
-});
-
-app.post("/webhook", async (req, res) => {
-  try {
-    if (MAKE_WEBHOOK_URL) {
-      await fetch(MAKE_WEBHOOK_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(req.body),
-      });
+  if (mode && token) {
+    if (mode === "subscribe" && token === VERIFY_TOKEN) {
+      console.log("WEBHOOK_VERIFIED");
+      res.status(200).send(challenge);
+    } else {
+      res.sendStatus(403);
     }
-    res.sendStatus(200);
-  } catch (e) {
-    console.error("Forward error:", e);
-    res.sendStatus(200);
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log("Webhook listening on " + PORT));
+app.listen(PORT, () => console.log(`Server is running on port ${PORT}`));
