@@ -4,45 +4,39 @@ const bodyParser = require("body-parser");
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware для обработки JSON-тел
+// Чтобы парсить JSON в POST-запросах
 app.use(bodyParser.json());
 
-// Верификация Webhook (GET)
+// Твой VERIFY_TOKEN из Meta
+const VERIFY_TOKEN = "tsurkava123";
+
+// ----- Верификация Webhook от Meta -----
 app.get("/webhook", (req, res) => {
-  const VERIFY_TOKEN = "tsurkava123"; // ТВОЙ маркер подтверждения
   const mode = req.query["hub.mode"];
   const token = req.query["hub.verify_token"];
   const challenge = req.query["hub.challenge"];
 
   if (mode && token) {
     if (mode === "subscribe" && token === VERIFY_TOKEN) {
-      console.log("✅ WEBHOOK_VERIFIED");
-      res.status(200).send(challenge);
+      console.log("WEBHOOK_VERIFIED");
+      res.status(200).send(challenge); // Возвращаем challenge обратно
     } else {
       res.sendStatus(403);
     }
+  } else {
+    res.sendStatus(400);
   }
 });
 
-// Приём событий (POST)
+// ----- Обработка входящих сообщений -----
 app.post("/webhook", (req, res) => {
-  console.log("📩 Incoming webhook event:");
-  console.log(JSON.stringify(req.body, null, 2));
+  console.log("POST /webhook", JSON.stringify(req.body, null, 2));
 
-  // если пришло сообщение от WhatsApp
-  if (
-    req.body.object &&
-    req.body.entry &&
-    req.body.entry[0].changes &&
-    req.body.entry[0].changes[0].value.messages
-  ) {
-    const message = req.body.entry[0].changes[0].value.messages[0];
-    console.log("💬 Новое сообщение:", message.text ? message.text.body : message);
-  }
-
-  // всегда отвечаем 200, чтобы Meta знала, что всё ок
+  // Обязательно отвечаем 200, чтобы Meta считала запрос успешным
   res.sendStatus(200);
 });
 
 // Запуск сервера
-app.listen(PORT, () => console.log(`🚀 Server is running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
