@@ -7,7 +7,7 @@ const PORT = process.env.PORT || 3000;
 // Чтобы парсить JSON в POST-запросах
 app.use(bodyParser.json());
 
-// Твой VERIFY_TOKEN из Meta
+// Твой VERIFY_TOKEN из Meta (тот, что указывал в настройках)
 const VERIFY_TOKEN = "tsurkava123";
 
 // ----- Верификация Webhook от Meta -----
